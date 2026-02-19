@@ -25,7 +25,7 @@ function Login() {
 
             // User Login
             if(role === "user"){
-                return navigate("/app/user");
+                return navigate("/app/user/dashboard");
             };
             
             
