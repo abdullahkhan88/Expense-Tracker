@@ -103,6 +103,24 @@ export const login = async (req, res) => {
     }
 };
 
+// logout
+export const logout = async (req, res) => {
+    try {
+       res.cookie('AuthToken', null, {
+        httpOnly:true,
+        secure: process.env.ENVIRONMENT !== "DEV",
+        sameSite: process.ENVIRONMENT === "DEV" ? "lax" : "none",
+        path: "/",
+        domain: undefined,
+        maxAge:0
+    });
+
+     res.status(200).send({ message: "User Logout successfully" || "Logout Failed" })
+    } catch (err) {
+        res.status(401).send({ message: err.message || "Logout Failed" })
+    }
+};
+
 // create Forgot Password
 export const ForgotPassword = async (req, res) => {
     try {

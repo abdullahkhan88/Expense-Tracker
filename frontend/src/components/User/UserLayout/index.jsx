@@ -1,24 +1,40 @@
 import { AppstoreAddOutlined, BarChartOutlined, LogoutOutlined, MenuOutlined } from "@ant-design/icons";
-import { Button, Image, Layout, Menu } from "antd";
+import { Button, Image, Layout, Menu, message } from "antd";
 import { useState } from "react";
 
 
 import { Outlet, useNavigate,useLocation } from "react-router-dom";
 import fetcher from "../../../utils/fetcher";
 import Loader from "../../Shared/Loader";
+import http from "../../../utils/http";
 const { Sider, Header, Content, } = Layout;
 
 const UserLayout = () => {
 
   const navigate = useNavigate();
   const {pathname} = useLocation();
-  
+  const [loading, setLoading] = useState(false);
 
   const [open, setOpen] = useState(false);
+
 
   const handleNavigate = (menu) => {
     navigate(menu.key)
   };
+
+  // logout
+
+  const logout = async () =>{
+    try {
+      setLoading(true)
+      await http.get("/api/user/logout");
+      navigate('/')
+      setLoading(false)
+    } catch (err) {
+      setLoading(false)
+      message.error(err.response? err.response.data.message : err.message);
+    }
+  }
 
  
 
@@ -80,7 +96,8 @@ const UserLayout = () => {
             onClick={() => setOpen(!open)}
             icon={<MenuOutlined />}
           />
-          <Button
+          <Button onClick={logout}
+            loading={loading}
             icon={<LogoutOutlined />}
           />
         </Header>
