@@ -1,5 +1,5 @@
 import { AppstoreAddOutlined, BarChartOutlined, LogoutOutlined, MenuOutlined } from "@ant-design/icons";
-import { Button, Image, Layout, Menu, message } from "antd";
+import { Button, Image, Layout, Menu, message, theme } from "antd";
 import { useState } from "react";
 
 
@@ -36,7 +36,9 @@ const UserLayout = () => {
     }
   }
 
- 
+  const {
+    token:{colorBgContainer,borderRadiusLG}
+  } = theme.useToken();
 
 
   const items = [
@@ -101,7 +103,13 @@ const UserLayout = () => {
             icon={<LogoutOutlined />}
           />
         </Header>
-        <Content>
+        <Content style={{
+          margin:"4px 8px",
+          padding:4,
+          minHeight:280,
+          background:colorBgContainer,
+          borderRadius:borderRadiusLG
+        }}>
           <Outlet />
         </Content>
       </Layout>
