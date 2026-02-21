@@ -1,4 +1,4 @@
-import { AppstoreAddOutlined, BarChartOutlined, LogoutOutlined, MenuOutlined } from "@ant-design/icons";
+import { AppstoreAddOutlined, BarChartOutlined, DollarCircleOutlined, LogoutOutlined, MenuOutlined } from "@ant-design/icons";
 import { Button, Image, Layout, Menu, message, theme } from "antd";
 import { useState } from "react";
 
@@ -51,6 +51,11 @@ const UserLayout = () => {
       key: "/app/user/report",
       label: "Reports",
       icon: <BarChartOutlined />
+    },
+    {
+      key: "/app/user/transaction",
+      label: "Transaction",
+      icon: <DollarCircleOutlined />
     },
   ];
 

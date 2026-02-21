@@ -12,6 +12,8 @@ const ForgotPassword = lazy(() => import('./components/Home/ForgotPassword'));
 const Dashboard = lazy(() => import('./components/User/Dashboard'));
 const Report = lazy(() => import('./components/User/Report'));
 const HomeLayout = lazy(() => import('./layout/HomeLayout'));
+const Transaaction = lazy(() => import('./components/User/Transactions'));
+
 
 function App() {
   return (
@@ -35,6 +37,7 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="report" element={<Report />} />
+            <Route path="transaction" element={<Transaaction />} />
           </Route>
 
         </Routes>
