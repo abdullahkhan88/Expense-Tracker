@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 /* api Router Importing */
 import userRouter from './App/user/user.routes.js';
 import otpRouter from './App/user/otp/otp.route.js';
+import TransactionRouter from './App/transaction/transaction.route.js';
 
 
 dotenv.config();
@@ -18,7 +19,7 @@ app.use(cors({
     credentials:true,
 }));
 app.use(express.json());
-app.use(express.urlencoded({extended:false}));
+app.use(express.urlencoded({extended:true}));
 
 // connectdb
 connectdb();
@@ -26,6 +27,7 @@ connectdb();
 app.use(cookieParser())
 app.use('/api/user',userRouter);
 app.use('/api/otp',otpRouter);
+app.use('/api/transaction',TransactionRouter);
 
 
 const PORT = process.env.PORT || 8000
