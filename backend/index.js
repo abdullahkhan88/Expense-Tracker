@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 import userRouter from './App/user/user.routes.js';
 import otpRouter from './App/user/otp/otp.route.js';
 import TransactionRouter from './App/transaction/transaction.route.js';
+import DashboardRouter from './App/Dashboard/dashboard.route.js';
 
 
 dotenv.config();
@@ -28,7 +29,7 @@ app.use(cookieParser())
 app.use('/api/user',userRouter);
 app.use('/api/otp',otpRouter);
 app.use('/api/transaction',TransactionRouter);
-
+app.use('/api/dashboard',DashboardRouter);
 
 const PORT = process.env.PORT || 8000
 app.listen(PORT ,() =>{

@@ -6,6 +6,6 @@ const TransactionRouter = Router();
 TransactionRouter.post("/create",AdminUserGuard,createTransaction);
 TransactionRouter.put("/update/:id",AdminUserGuard,updateTransaction);
 TransactionRouter.delete("/delete/:id",AdminUserGuard,deleteTransaction);
-TransactionRouter.get("/fetch",getTransaction);
+TransactionRouter.get("/fetch",AdminUserGuard,getTransaction);
 
 export default  TransactionRouter;

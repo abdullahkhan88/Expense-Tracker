@@ -7,7 +7,7 @@ export const createTransaction = async (req, res) =>{
         data.userId = id;
         const transaction = await new TransactionModel(data).save();
         res.status(200).send({
-            message:"Craeted Request",
+            message:"Data Craeted Successfully",
             data:transaction
         });
     } catch (err) {
@@ -68,7 +68,8 @@ export const deleteTransaction = async (req, res) =>{
 
 export const getTransaction = async (req, res) =>{
     try {
-        const transaction = await TransactionModel.find();
+        const {id} = req.user;
+        const transaction = await TransactionModel.find({userId:id});
         if(!transaction){
             res.status(404).send({
                 message:"Not found Data"
