@@ -69,7 +69,7 @@ export const deleteTransaction = async (req, res) =>{
 export const getTransaction = async (req, res) =>{
     try {
         const {id} = req.user;
-        const transaction = await TransactionModel.find({userId:id});
+        const transaction = await TransactionModel.find({userId:id}).sort({createdAt:-1});
         if(!transaction){
             res.status(404).send({
                 message:"Not found Data"

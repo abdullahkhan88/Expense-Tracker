@@ -20,7 +20,7 @@ function Login() {
             
             // Admin Login
             if(role === "admin"){
-                return message.success("Admin try to login");
+                return navigate("/app/admin/dashboard");
             };
 
             // User Login

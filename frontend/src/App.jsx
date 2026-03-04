@@ -4,15 +4,18 @@ import './App.css';
 import { lazy, Suspense } from 'react';
 import Loader from './components/Shared/Loader';
 
+
+const Users = lazy(() => import('./components/Shared/Users'));
+const AdminLayout = lazy(() => import('./components/Admin/AdminLayout') )
 const Login = lazy(() => import('./components/Home/Login'));
 const Signup = lazy(() => import('./components/Home/Signup'));
 const UserLayout = lazy(() => import('./components/User/UserLayout'));
 const PageNotFound = lazy(() => import('./components/PageNotFound'));
 const ForgotPassword = lazy(() => import('./components/Home/ForgotPassword'));
-const Dashboard = lazy(() => import('./components/User/Dashboard'));
-const Report = lazy(() => import('./components/User/Report'));
+const Dashboard = lazy(() => import('./components/Shared/Dashboard'));
+const Report = lazy(() => import('./components/Shared/Report'));
 const HomeLayout = lazy(() => import('./layout/HomeLayout'));
-const Transaaction = lazy(() => import('./components/User/Transactions'));
+const Transaaction = lazy(() => import('./components/Shared/Transactions'));
 
 
 function App() {
@@ -29,7 +32,18 @@ function App() {
             <Route path="*" element={<PageNotFound />} />
           </Route>
 
-          {/* User Layout */}
+          {/* admin related routes */}
+            <Route path="/app/admin"
+            element={<Guard endpoint="/api/user/session" role="admin">
+              <AdminLayout />
+            </Guard>}>
+            <Route index element={<Dashboard />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="report" element={<Report />} />
+            <Route path="users" element={<Users />} />
+          </Route>
+
+          {/* User routes */}
           <Route path="/app/user"
             element={<Guard endpoint="/api/user/session" role="user">
               <UserLayout />

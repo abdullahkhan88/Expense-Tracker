@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 
 
 
-
+// create user
 export const createUser = async (req, res) => {
     try {
         const { fullname, email, password, mobile, status, role } = req.body;
@@ -48,6 +48,57 @@ export const createUser = async (req, res) => {
     }
 };
 
+// updateStatus
+export const updateStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const { id } = req.params;
+
+    const user = await UserModel.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).send({
+        message: "User not found",
+      });
+    }
+
+    res.status(200).send({
+      message: "Status Updated Successfully",
+      data: user,
+    });
+
+  } catch (err) {
+    res.status(500).send({
+      message: "Internal Server Error",
+      error: err.message,
+    });
+  }
+};
+
+// getAllUsers
+export const getAllUsers = async (req, res) =>{
+    try {
+        const Users = await UserModel.find().sort({createdAt:-1});
+        if(!Users){
+            res.status(404).send({
+                message:"Not found Data"
+            });
+        };
+        res.status(200).send({
+            message:"Data Fetch Successfully",
+            data:Users
+        });
+    } catch (err) {
+        res.status(500).send({
+            message: "Some Internal Problems",
+            error: err.message
+        });
+    }
+};
 
 /* create Token */
 const createToken = (user) => {
@@ -78,6 +129,9 @@ export const login = async (req, res) => {
         const existUser = await bcrypt.compare(password, user.password);
         if (!existUser) {
             return res.status(401).send({ message: "Invalid Credentials" })
+        };
+        if (user.status == false) {
+            return res.status(403).send({  message: "Your account is inactive. Please contact support."})
         };
         user.status = true;
         await user.save();

@@ -1,6 +1,15 @@
 import { Router } from "express";
-import  { AdminUserGuard,verifyTokenGuard } from "../middleware/guard.middleware.js";
-import { createUser,login, ForgotPassword, verifyToken, changePassword,logout } from "./user.controller.js";
+import  { AdminUserGuard,AdminGuard,verifyTokenGuard } from "../middleware/guard.middleware.js";
+import { 
+    createUser,
+    login, 
+    ForgotPassword,
+    verifyToken,
+    changePassword,
+    logout,
+    getAllUsers,
+    updateStatus
+} from "./user.controller.js";
 /* import sendMail from "../utils/mail.js"; */
 
 const userRouter = Router();
@@ -8,11 +17,18 @@ const userRouter = Router();
 // @post /api/user/signup
 userRouter.post('/signup',createUser);
 
+
 // @post /api/user/login
 userRouter.post('/login',login);
 
 // @get /api/user/logout
 userRouter.get('/logout',logout);
+
+// @get /api/user/getAll User
+userRouter.get('/get',AdminGuard,getAllUsers);
+
+// @get /api/user/getAll User
+userRouter.put('/status/:id',AdminGuard,updateStatus);
 
 // @post /api/user/forgot-password
 userRouter.post('/forgot-password',ForgotPassword);

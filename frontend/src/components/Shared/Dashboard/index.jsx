@@ -1,10 +1,26 @@
 import { BarcodeOutlined, DollarCircleOutlined, MinusCircleOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import { Button, Card, Divider } from "antd";
-import DailyTransactionChart from "../../Shared/DailyTransaction";
+import DailyTransactionChart from "../DailyTransaction";
 import { generateFakeTransactions } from "../../../utils/fakeTransaction";
+import { useEffect, useState } from "react";
+import http from "../../../utils/http";
+import Loader from "../Loader";
 
 
 const Dashboard = () => {
+
+    const [report, setReport] = useState(null);
+
+    useEffect(() =>{
+        http.get("/api/dashboard/report")
+        .then((res) => setReport(res.data))
+        .catch(console.error);
+    },[]);
+    
+    if(!report) return <Loader/>
+
+    const {summary,chart} = report;
+
     const fakeTransaction = generateFakeTransactions(30);
     return (
         <div>
@@ -26,10 +42,10 @@ const Dashboard = () => {
                         <Divider vertical className="h-24" />
                         <div>
                             <h1 className="text-3xl font-bold text-rose-400">
-                                100 T
+                                {summary?.totalTransaction} T
                             </h1>
                             <p className="text-lg mt-1 text-zinc-400">
-                                200 Estimate
+                                {summary?.totalTransactionEstimate} Estimate
                             </p>
                         </div>
                     </div>
@@ -45,16 +61,16 @@ const Dashboard = () => {
                                 className="!bg-green-600"
                             />
                             <h1 className="text-xl font-semibold text-green-600">
-                                Transaction
+                                Total Credit
                             </h1>
                         </div>
                         <Divider vertical className="h-24" />
                         <div>
                             <h1 className="text-3xl font-bold text-green-400">
-                                100 T
+                                {summary?.totalCredit} T
                             </h1>
                             <p className="text-lg mt-1 text-zinc-400">
-                                200 Estimate
+                                 {summary?.totalCreditEstimate} Estimate
                             </p>
                         </div>
                     </div>
@@ -70,16 +86,16 @@ const Dashboard = () => {
                                 className="!bg-orange-600"
                             />
                             <h1 className="text-xl font-semibold text-orange-600">
-                                Total Credit
+                                Total Debit
                             </h1>
                         </div>
                         <Divider vertical className="h-24" />
                         <div>
                             <h1 className="text-3xl font-bold text-orange-400">
-                                100 T
+                                {summary?.totalDebit} T
                             </h1>
                             <p className="text-lg mt-1 text-zinc-400">
-                                200 Estimate
+                                {summary?.totalDebitEstimate} Estimate
                             </p>
                         </div>
                     </div>
@@ -95,23 +111,23 @@ const Dashboard = () => {
                                 className="!bg-indigo-600"
                             />
                             <h1 className="text-xl font-semibold text-indigo-600">
-                                Transaction
+                                Balance
                             </h1>
                         </div>
                         <Divider vertical className="h-24" />
                         <div>
                             <h1 className="text-3xl font-bold text-indigo-400">
-                                100 T
+                                {summary?.balance} T
                             </h1>
                             <p className="text-lg mt-1 text-zinc-400">
-                                200 Estimate
+                                {summary?.balanceEstimate} Estimate
                             </p>
                         </div>
                     </div>
                 </Card>
             </div>
             <div className="hidden md:block mt-5 grid md:grid-cols-1">
-                <DailyTransactionChart transactions={fakeTransaction}/>
+                <DailyTransactionChart transactions={chart}/>
             </div>
         </div>
     );

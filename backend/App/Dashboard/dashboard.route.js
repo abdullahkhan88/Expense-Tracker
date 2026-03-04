@@ -5,6 +5,6 @@ import { getReports } from "./dashboard.controller.js";
 
 const DashboardRouter = Router();
 
-DashboardRouter.get('/reports',AdminUserGuard,getReports);
+DashboardRouter.get('/report',AdminUserGuard,getReports);
 
 export default DashboardRouter;

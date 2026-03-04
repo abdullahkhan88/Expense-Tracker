@@ -20,28 +20,13 @@ const getLast30Days = () => {
 };
 
 const DailyTransactionChart = ({ transactions = [] }) => {
-  const dailyTotals = {};
-
-  transactions && transactions.forEach((txn) => {
-    const dateStr = dayjs(txn.date?.$date || txn.date).format("YYYY-MM-DD");
-    if (!dailyTotals[dateStr]) {
-      dailyTotals[dateStr] = 0;
-    }
-    dailyTotals[dateStr] += Number(txn.amount);
-  });
-
-  const last30Days = getLast30Days();
-  const chartData = last30Days.map((date) => ({
-    date,
-    total: dailyTotals[date] || 0,
-  }));
+  
 
   return (
     <Card title="📆 Daily Transaction Summary (Last 30 Days)" className="rounded-2xl shadow-md">
       <div className="w-full h-64">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" />
+          <LineChart data={transactions}>
             <XAxis dataKey="date" />
             <YAxis />
             <Tooltip />
