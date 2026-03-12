@@ -1,6 +1,6 @@
 import UserModel from './user.model.js';
 import sendMail from "../utils/mail.js";
-import {forgotPasswordTemplate }from "../utils/forgot.tamplate.js";
+import { forgotPasswordTemplate } from "../utils/forgot.tamplate.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -50,47 +50,53 @@ export const createUser = async (req, res) => {
 
 // updateStatus
 export const updateStatus = async (req, res) => {
-  try {
-    const { status } = req.body;
-    const { id } = req.params;
+    try {
+        const { status } = req.body;
+        const { id } = req.params;
 
-    const user = await UserModel.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true }
-    );
+        const user = await UserModel.findByIdAndUpdate(
+            id,
+            { status },
+            { new: true }
+        );
 
-    if (!user) {
-      return res.status(404).send({
-        message: "User not found",
-      });
+        if (!user) {
+            return res.status(404).send({
+                message: "User not found",
+            });
+        }
+
+        res.status(200).send({
+            message: "Status Updated Successfully",
+            data: user,
+        });
+
+    } catch (err) {
+        res.status(500).send({
+            message: "Internal Server Error",
+            error: err.message,
+        });
     }
-
-    res.status(200).send({
-      message: "Status Updated Successfully",
-      data: user,
-    });
-
-  } catch (err) {
-    res.status(500).send({
-      message: "Internal Server Error",
-      error: err.message,
-    });
-  }
 };
 
 // getAllUsers
-export const getAllUsers = async (req, res) =>{
+export const getAllUsers = async (req, res) => {
     try {
-        const Users = await UserModel.find().sort({createdAt:-1});
-        if(!Users){
+        const { page, limit } = req.query;
+        const skip = (page - 1) * limit;
+        const Users = await UserModel.find().sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+        const total = await UserModel.countDocuments()
+        if (!Users) {
             res.status(404).send({
-                message:"Not found Data"
+                message: "Not found Data"
             });
         };
         res.status(200).send({
-            message:"Data Fetch Successfully",
-            data:Users
+            message: "Data Fetch Successfully",
+            data: Users,
+            total
         });
     } catch (err) {
         res.status(500).send({
@@ -131,7 +137,7 @@ export const login = async (req, res) => {
             return res.status(401).send({ message: "Invalid Credentials" })
         };
         if (user.status == false) {
-            return res.status(403).send({  message: "Your account is inactive. Please contact support."})
+            return res.status(403).send({ message: "Your account is inactive. Please contact support." })
         };
         user.status = true;
         await user.save();
@@ -140,16 +146,16 @@ export const login = async (req, res) => {
         delete userRes.password;
         const DayMs = 24 * 60 * 60 * 1000; // convert 1 day into milliseconds
         res.cookie("AuthToken", token, {
-            httpOnly:true,
+            httpOnly: true,
             secure: process.env.ENVIRONMENT !== "DEV",
             sameSite: process.env.ENVIRONMENT === "DEV" ? "lax" : "none",
-            path : "/",
-            domain : undefined,
+            path: "/",
+            domain: undefined,
             maxAge: DayMs,
         });
         res.status(200).send({
             data: userRes,
-            role:user.role,
+            role: user.role,
             message: "login Successfull"
         })
     } catch (err) {
@@ -160,16 +166,16 @@ export const login = async (req, res) => {
 // logout
 export const logout = async (req, res) => {
     try {
-       res.cookie('AuthToken', null, {
-        httpOnly:true,
-        secure: process.env.ENVIRONMENT !== "DEV",
-        sameSite: process.ENVIRONMENT === "DEV" ? "lax" : "none",
-        path: "/",
-        domain: undefined,
-        maxAge:0
-    });
+        res.cookie('AuthToken', null, {
+            httpOnly: true,
+            secure: process.env.ENVIRONMENT !== "DEV",
+            sameSite: process.ENVIRONMENT === "DEV" ? "lax" : "none",
+            path: "/",
+            domain: undefined,
+            maxAge: 0
+        });
 
-     res.status(200).send({ message: "User Logout successfully" || "Logout Failed" })
+        res.status(200).send({ message: "User Logout successfully" || "Logout Failed" })
     } catch (err) {
         res.status(401).send({ message: err.message || "Logout Failed" })
     }
@@ -178,24 +184,24 @@ export const logout = async (req, res) => {
 // create Forgot Password
 export const ForgotPassword = async (req, res) => {
     try {
-        const {email} = req.body;
+        const { email } = req.body;
         if (!email) {
             return res.status(400).send({ message: "Fields are required !" });
         };
         const user = await UserModel.findOne({ email });
         if (!user) {
-            return res.status(404).send({message:"User doesn't exists" });
+            return res.status(404).send({ message: "User doesn't exists" });
         };
-        
-        const token = jwt.sign({id:user._id},process.env.FORGOT_TOKEN_SECRET,{expiresIn:"15m"});
+
+        const token = jwt.sign({ id: user._id }, process.env.FORGOT_TOKEN_SECRET, { expiresIn: "15m" });
         const link = `${process.env.DOMAIN}/forgot-password?token=${token}`;
-        const sent = await sendMail(email,"Expense - Forgot Password ?",forgotPasswordTemplate(user.fullname,link));
-        if(!sent){
-            return res.status(404).send({message:"Email sent Failed !"})
+        const sent = await sendMail(email, "Expense - Forgot Password ?", forgotPasswordTemplate(user.fullname, link));
+        if (!sent) {
+            return res.status(404).send({ message: "Email sent Failed !" })
         };
         // email sent hoga to inbox check
         res.status(200).send(
-            {message:"If this email is registered, you will receive a password reset link"}
+            { message: "If this email is registered, you will receive a password reset link" }
         );
     } catch (err) {
         res.status(500).send({ message: err.message })
@@ -205,9 +211,9 @@ export const ForgotPassword = async (req, res) => {
 // verify token 
 export const verifyToken = async (req, res) => {
     try {
-        
+
         res.status(200).send(
-            {message:"Verification success"}
+            { message: "Verification success" }
         );
     } catch (err) {
         res.status(500).send({ message: err.message })
@@ -217,11 +223,11 @@ export const verifyToken = async (req, res) => {
 // changePassword
 export const changePassword = async (req, res) => {
     try {
-        const {password} = req.body;
-        const encrypted = await bcrypt.hash(password.toString(),12);
-        await UserModel.findByIdAndUpdate(req.user.id,{password:encrypted});
+        const { password } = req.body;
+        const encrypted = await bcrypt.hash(password.toString(), 12);
+        await UserModel.findByIdAndUpdate(req.user.id, { password: encrypted });
         res.status(200).send(
-            {message:"Password Updated successfully"}
+            { message: "Password Updated successfully" }
         );
     } catch (err) {
         res.status(500).send({ message: err.message })

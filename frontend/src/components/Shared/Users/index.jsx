@@ -14,11 +14,43 @@ const Users = () => {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
+   const [users, setUsers] = useState([]);
+  const [no, setNo] = useState(0);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 1,
+    total: 0
+  });
 
-  const { data: users, isLoading } = useSWR(
+/*   const { data: users, isLoading } = useSWR(
     "/api/user/get",
     fetcher
-  );
+  ); */
+
+    const fetchUser = async (page=1,pageSize=5) => {
+    try {
+      setLoading(true);
+      const res = await http.get(`/api/user/get?page=${page}&limit=${pageSize}`);
+      const { data, total } = res.data;
+      setUsers(data);
+      setPagination({
+        current: page,
+        pageSize: pageSize,
+        total: total
+      });
+    } catch (error) {
+      message.error("Failed to fetch transactions");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchUser(
+      pagination.current,
+      pagination.pageSize
+    );
+  }, [no])
 
   // ================= STATUS DATA =================
   const onStatus = async (record) => {
@@ -26,7 +58,7 @@ const Users = () => {
       setLoading(true)
       await http.put(`/api/user/status/${record._id}`, { status: !record.status });
       message.success('status updated successfully');
-      mutate('/api/user/get');
+      setNo(no+1);
     } catch (error) {
       message.error(error.response?.data?.message || error.message)
     } finally {
@@ -35,7 +67,7 @@ const Users = () => {
   }
 
   // ================= FILTERED DATA =================
-  const filteredData = users?.data?.filter(item =>
+  const filteredData = users?.filter(item =>
     Object.values(item || {})
       .join(" ")
       .toLowerCase()
@@ -59,6 +91,10 @@ const Users = () => {
 
     return () => clearTimeout(timer);
   }, [search]);
+
+  const handleTableChange = (pagination) =>{
+    fetchUser(pagination.current, pagination.pageSize);
+  }
 
 
   // ================= TABLE COLUMNS =================
@@ -145,7 +181,9 @@ const Users = () => {
           columns={columns}
           dataSource={filteredData}
           scroll={{ x: "max-content" }}
-          loading={isLoading}
+          loading={loading}
+          onChange={handleTableChange}
+          pagination={pagination}
         />
       </Card>
     </div>

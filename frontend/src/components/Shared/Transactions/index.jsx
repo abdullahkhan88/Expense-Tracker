@@ -1,9 +1,9 @@
 import { DeleteOutlined, EditOutlined, SearchOutlined } from "@ant-design/icons";
 import { Button, Card, Form, Input, message, Modal, Popconfirm, Select, Table, Tag } from "antd";
 import http from "../../../utils/http";
-import useSWR, { mutate } from "swr";
-import { useState } from "react";
-import fetcher from "../../../utils/fetcher";
+// import useSWR, { mutate } from "swr";
+import { useEffect, useState } from "react";
+// import fetcher from "../../../utils/fetcher";
 
 const { Item } = Form;
 
@@ -14,11 +14,43 @@ const Transaction = () => {
   const [modal, setModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
+  const [transaction, setTransaction] = useState([]);
+  const [no, setNo] = useState(0);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 2,
+    total: 0
+  });
 
-  const { data: transaction, isLoading } = useSWR(
+  /* const { data: transaction, isLoading } = useSWR(
     "/api/transaction/fetch",
     fetcher
-  );
+  ); */
+
+  const fetchTransaction = async (page=1,pageSize=5) => {
+    try {
+      setLoading(true);
+      const res = await http.get(`/api/transaction/fetch?page=${page}&limit=${pageSize}`);
+      const { data, total } = res.data;
+      setTransaction(data);
+      setPagination({
+        current: page,
+        pageSize: pageSize,
+        total: total
+      });
+    } catch (error) {
+      message.error("Failed to fetch transactions");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchTransaction(
+      pagination.current,
+      pagination.pageSize
+    );
+  }, [no])
 
   // ================= CREATE =================
   const onFinish = async (values) => {
@@ -26,7 +58,7 @@ const Transaction = () => {
       setLoading(true);
       const { data } = await http.post('/api/transaction/create', values);
       message.success(data?.message);
-      mutate("/api/transaction/fetch");
+      setNo(no+1);
       transactionForm.resetFields();
       closeModal();
     } catch (err) {
@@ -42,7 +74,7 @@ const Transaction = () => {
       setLoading(true);
       const { data } = await http.put(`/api/transaction/update/${edit._id}`, values);
       message.success(data?.message);
-      mutate("/api/transaction/fetch");
+      setNo(no+1);
       closeModal();
       transactionForm.resetFields();
     } catch (err) {
@@ -58,7 +90,7 @@ const Transaction = () => {
       setLoading(true);
       const { data } = await http.delete(`/api/transaction/delete/${id}`);
       message.success(data?.message);
-      mutate("/api/transaction/fetch");
+      setNo(no+1);
     } catch (err) {
       message.error(err?.response?.data?.message || err.message);
     } finally {
@@ -78,8 +110,14 @@ const Transaction = () => {
     transactionForm.resetFields();
   };
 
+  // pagination table change 
+
+  const handleTableChange = (pagination) =>{
+    fetchTransaction(pagination.current, pagination.pageSize);
+  }
+
   // ================= FILTERED DATA =================
-  const filteredData = transaction?.data?.filter(item =>
+  const filteredData = transaction?.filter(item =>
     Object.values(item)
       .join(" ")
       .toLowerCase()
@@ -227,7 +265,9 @@ const Transaction = () => {
           columns={columns}
           dataSource={filteredData}
           scroll={{ x: "max-content" }}
-          loading={isLoading}
+          loading={loading}
+          pagination={pagination}
+          onChange={handleTableChange}
         />
       </Card>
 
@@ -302,7 +342,7 @@ const Transaction = () => {
               type="primary"
               danger={edit ? true : false}
               htmlType="submit"
-              
+
             >
               {edit ? "Update" : "Submit"}
             </Button>
