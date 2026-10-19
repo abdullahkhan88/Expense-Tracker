@@ -1,3 +1,4 @@
+
 import nodemailer from "nodemailer";
 
 const sendMail = async (email, subject, template) => {
@@ -11,6 +12,11 @@ const sendMail = async (email, subject, template) => {
       port: 465,
       secure: true,
       family: 4,
+
+      connectionTimeout: 15000,
+      greetingTimeout: 15000,
+      socketTimeout: 20000,
+
       auth: {
         user: process.env.SENDER_EMAIL,
         pass: process.env.SENDER_PASSWORD,
@@ -18,6 +24,7 @@ const sendMail = async (email, subject, template) => {
     });
 
     console.log("Attempting to send email to:", email);
+    console.log("Connecting to Gmail SMTP...");
 
     const info = await config.sendMail({
       from: process.env.SENDER_EMAIL,
@@ -34,6 +41,8 @@ const sendMail = async (email, subject, template) => {
   } catch (error) {
     console.error("Email sending failed:", error.message);
     console.error("Error code:", error.code);
+    console.error("Error command:", error.command);
+
     return false;
   }
 };
