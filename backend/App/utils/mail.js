@@ -1,47 +1,31 @@
 
-import nodemailer from "nodemailer";
+import emailjs from "@emailjs/nodejs";
 
-const sendMail = async (email, subject, template) => {
-  console.log("sendMail function called");
-  console.log("Sender configured:", !!process.env.SENDER_EMAIL);
-  console.log("Password configured:", !!process.env.SENDER_PASSWORD);
-
+const sendMail = async (email, subject,otp ) => {
   try {
-    const config = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
-      family: 4,
+    console.log("EmailJS sendMail called");
+    console.log("Recipient:", email);
 
-      connectionTimeout: 15000,
-      greetingTimeout: 15000,
-      socketTimeout: 20000,
-
-      auth: {
-        user: process.env.SENDER_EMAIL,
-        pass: process.env.SENDER_PASSWORD,
+    const response = await emailjs.send(
+      process.env.EMAILJS_SERVICE_ID,
+      process.env.EMAILJS_TEMPLATE_ID,
+      {
+        to_email: email,
+        subject: subject,
+        otp:otp,
       },
-    });
+      {
+        publicKey: process.env.EMAILJS_PUBLIC_KEY,
+        privateKey: process.env.EMAILJS_PRIVATE_KEY,
+      }
+    );
 
-    console.log("Attempting to send email to:", email);
-    console.log("Connecting to Gmail SMTP...");
-
-    const info = await config.sendMail({
-      from: process.env.SENDER_EMAIL,
-      to: email,
-      subject,
-      html: template,
-    });
-
-    console.log("Email accepted:", info.accepted);
-    console.log("Email rejected:", info.rejected);
-    console.log("Message ID:", info.messageId);
+    console.log("EmailJS status:", response.status);
+    console.log("EmailJS response:", response.text);
 
     return true;
   } catch (error) {
-    console.error("Email sending failed:", error.message);
-    console.error("Error code:", error.code);
-    console.error("Error command:", error.command);
+    console.error("EmailJS sending failed:", error);
 
     return false;
   }

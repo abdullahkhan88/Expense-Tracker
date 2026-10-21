@@ -34,7 +34,7 @@ const otpTemplate = (otp) => {
                 </p>
 
                 <div style="font-size:32px; letter-spacing:8px; margin:25px 0; color:#007bff; font-weight:bold;">
-                    {${otp}}
+                    {{otp}}
                 </div>
 
                 <p style="font-size:14px; color:#888;">
